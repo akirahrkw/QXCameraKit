@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "QXCameraKit"
-  s.version      = "0.0.1"
+  s.version      = "0.1.0"
   s.summary      = "Sony QX camera API library written by swift"
 
   s.description  = <<-DESC
