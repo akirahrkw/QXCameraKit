@@ -15,7 +15,7 @@ Pod::Spec.new do |s|
   s.homepage     = "http://www.akirahrkw.com"
 
   s.platform     = :ios, "7.0"
-  s.source       = { :git => "https://github.com/akirahrkw/QXCameraKit.git", :tag => "0.0.1" }
+  s.source       = { :git => "https://github.com/akirahrkw/QXCameraKit.git", :tag => "0.1.0" }
 
   s.source_files  = "QXCameraKit", "QXCameraKit/**/*.{h,m,swift}"
   #s.exclude_files = "Classes/Exclude"
