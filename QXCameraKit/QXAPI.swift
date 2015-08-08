@@ -82,52 +82,52 @@ public class QXAPI {
     
     // MARK: - serverinformation methods
     public func getAvailableApiList() -> NSData? {
-        var url = self.device.findActionListUrl("camera")
-        var params = self.createRequestJson(QXAPIList.GetAvailableApiList)
+        let url = self.device.findActionListUrl("camera")
+        let params = self.createRequestJson(QXAPIList.GetAvailableApiList)
         return self.call(url, postParams:params)
     }
     
     public func getApplicationInfo() -> NSData? {
-        var url = self.device.findActionListUrl("camera")
-        var params = self.createRequestJson(QXAPIList.GetApplicationInfo)
+        let url = self.device.findActionListUrl("camera")
+        let params = self.createRequestJson(QXAPIList.GetApplicationInfo)
         return self.call(url, postParams:params)
     }
     
     public func getVersions() -> NSData? {
-        var url = self.device.findActionListUrl("camera")
-        var params = self.createRequestJson(QXAPIList.GetVersions)
+        let url = self.device.findActionListUrl("camera")
+        let params = self.createRequestJson(QXAPIList.GetVersions)
         return self.call(url, postParams:params)
     }
 
     public func getMethodTypes(version:NSString, closure:APIResponseClosure) {
-        var params = "[\"\(version)\"]"
+        let params = "[\"\(version)\"]"
         createPostRequest(QXAPIList.GetMethodTypes, params:params, closure:closure)
     }
 
     public func getEvent(longPolling:Bool, closure:APIResponseClosure) {
-        var param = longPolling ? "true" : "false"
-        var params = "[\(param)]"
+        let param = longPolling ? "true" : "false"
+        let params = "[\(param)]"
         createPostRequest(QXAPIList.GetEvent, params:params, closure:closure)
     }
 
     // MARK: - Zoom methods
     public func startZoomIn(closure:APIResponseClosure) {
-        var params = "[\"in\",\"start\"]"
+        let params = "[\"in\",\"start\"]"
         createPostRequest(QXAPIList.ActZoom, params:params, closure:closure)
     }
 
     public func stopZoomIn(closure:APIResponseClosure) {
-        var params = "[\"in\",\"stop\"]"
+        let params = "[\"in\",\"stop\"]"
         createPostRequest(QXAPIList.ActZoom, params:params, closure:closure)
     }
 
     public func startZoomOut(closure:APIResponseClosure) {
-        var params = "[\"out\",\"start\"]"
+        let params = "[\"out\",\"start\"]"
         createPostRequest(QXAPIList.ActZoom, params:params, closure:closure)
     }
     
     public func stopZoomOut(closure:APIResponseClosure) {
-        var params = "[\"out\",\"stop\"]"
+        let params = "[\"out\",\"stop\"]"
         createPostRequest(QXAPIList.ActZoom, params:params, closure:closure)
     }
 
@@ -145,7 +145,7 @@ public class QXAPI {
     }
 
     public func setStillSize(aspect:NSString, size:NSString, closure:APIResponseClosure) {
-        var params = "[\"\(aspect)\",\"\(size)\"]"
+        let params = "[\"\(aspect)\",\"\(size)\"]"
         createPostRequest(QXAPIList.SetStillSize, params:params, closure:closure)
     }
 
@@ -163,7 +163,7 @@ public class QXAPI {
     }
     
     public func setPostviewImageSize(size:NSString, closure:APIResponseClosure) {
-        var params = "[\"\(size)\"]"
+        let params = "[\"\(size)\"]"
         createPostRequest(QXAPIList.SetPostviewImageSize, params:params, closure:closure)
     }
 
@@ -183,7 +183,7 @@ public class QXAPI {
     
     // MARK: - TouchAF methods
     public func setTouchAFPosition(x:CGFloat, y:CGFloat, closure:APIResponseClosure) {
-        var params = "[\(x), \(y)]"
+        let params = "[\(x), \(y)]"
         createPostRequest(QXAPIList.SetTouchAfPosition, params:params, closure:closure)
     }
     
@@ -209,7 +209,7 @@ public class QXAPI {
     }
     
     public func setExposureMode(mode:NSString, closure:APIResponseClosure) {
-        var params = "[\"\(mode)\"]"
+        let params = "[\"\(mode)\"]"
         createPostRequest(QXAPIList.SetExposureMode, params:params, closure:closure)
     }
     
@@ -227,7 +227,7 @@ public class QXAPI {
     }
     
     public func setIsoSpeedRate(rate:NSString, closure:APIResponseClosure) {
-        var params = "[\"\(rate)\"]"
+        let params = "[\"\(rate)\"]"
         createPostRequest(QXAPIList.SetIsoSpeedRate, params:params, closure:closure)
     }
 
@@ -245,7 +245,7 @@ public class QXAPI {
     }
     
     public func setWhiteBalance(balance:NSString, closure:APIResponseClosure) {
-        var params = "[\"\(balance)\"]"
+        let params = "[\"\(balance)\"]"
         createPostRequest(QXAPIList.SetWhiteBalance, params:params, closure:closure)
     }
 
@@ -263,20 +263,20 @@ public class QXAPI {
     }
     
     public func setShootMode(mode:NSString, closure:APIResponseClosure) {
-        var params = "[\"\(mode)\"]"
+        let params = "[\"\(mode)\"]"
         createPostRequest(QXAPIList.SetShootMode, params:params, closure:closure)
     }
     
     // MARK: - LiveView methods
     public func startLiveView() -> NSData {
-        var url = self.device.findActionListUrl("camera")
-        var params = self.createRequestJson(QXAPIList.StartLiveview)
+        let url = self.device.findActionListUrl("camera")
+        let params = self.createRequestJson(QXAPIList.StartLiveview)
         return self.call(url, postParams:params)
     }
 
     public func stopLiveView() -> NSData {
-        var url = self.device.findActionListUrl("camera")
-        var params = self.createRequestJson(QXAPIList.StopLiveview)
+        let url = self.device.findActionListUrl("camera")
+        let params = self.createRequestJson(QXAPIList.StopLiveview)
         return self.call(url, postParams:params)
     }
 
@@ -294,7 +294,7 @@ public class QXAPI {
     }
 
     public func setBeepMode(mode:NSString, closure:APIResponseClosure) {
-        var params = "[\"\(mode)\"]"
+        let params = "[\"\(mode)\"]"
         createPostRequest(QXAPIList.SetBeepMode, params:params, closure:closure)
     }
 
@@ -304,18 +304,18 @@ public class QXAPI {
     }
     
     func createGetRequest(api:QXAPIList, closure:APIResponseClosure) {
-        var params = self.createRequestJson(api)
+        let params = self.createRequestJson(api)
         self.createAsynchronousRequest(api, params:params, closure:closure)
     }
 
     func createPostRequest(api:QXAPIList, params:NSString, closure:APIResponseClosure) {
-        var params = self.createRequestJson(api, params:params)
+        let params = self.createRequestJson(api, params:params)
         self.createAsynchronousRequest(api, params:params, closure:closure)
     }
     
     func createAsynchronousRequest(api:QXAPIList, params:NSString, closure:APIResponseClosure) {
-        var url = self.device.findActionListUrl("camera")
-        var request = HttpAsynchronousRequest(url:url, postParams:params, apiName:api.rawValue, closure:closure)
+        let url = self.device.findActionListUrl("camera")
+        let request = HttpAsynchronousRequest(url:url, postParams:params, apiName:api.rawValue, closure:closure)
         request.execute()
     }
     
@@ -324,23 +324,23 @@ public class QXAPI {
     }
 
     func createRequestJson(method:QXAPIList, params:NSString) -> NSString {
-        var version = "1.0"
-        var json = NSString(format:"{ \"method\":\"%@\",\"params\":%@,\"version\":\"%@\",\"id\":%d }", method.rawValue, params, version, self.getId())
+        let version = "1.0"
+        let json = NSString(format:"{ \"method\":\"%@\",\"params\":%@,\"version\":\"%@\",\"id\":%d }", method.rawValue, params, version, self.getId())
         return json
     }
 
     func call(url:NSString, postParams params:NSString) -> NSData {
-        
-        var url = NSURL(string:url)
-        var request = NSMutableURLRequest(URL:url!, cachePolicy:NSURLRequestCachePolicy.UseProtocolCachePolicy, timeoutInterval: 60.0)
+        let url = NSURL(string:url as String)
+        let request = NSMutableURLRequest(URL:url!, cachePolicy:NSURLRequestCachePolicy.UseProtocolCachePolicy, timeoutInterval: 60.0)
         request.HTTPMethod = "POST"
         request.HTTPBody = params.dataUsingEncoding(NSUTF8StringEncoding)
-        
-        var response:NSURLResponse? = nil
-        var error:NSError? = nil
-        var data = NSURLConnection.sendSynchronousRequest(request, returningResponse:&response, error:&error)
 
-        return data!
+        do {
+            var response:NSURLResponse? = nil
+            let data = try NSURLConnection.sendSynchronousRequest(request, returningResponse: &response)
+            return data
+        } catch {
+            return NSData()
+        }
     }
-    
 }

@@ -17,7 +17,7 @@ class QXDevice {
     }
     
     func findActionListUrl(service:NSString) -> NSString {
-        var value = self.services.objectForKey(service) as? NSString
-        return (value? != nil) ? value! : "camera"
+        let value = self.services.objectForKey(service) as? NSString
+        return (value != nil) ? value! : "camera"
     }
 }

@@ -30,11 +30,11 @@ public class QXAPIManager: NSObject {
         }
         
         if(!self.liveManager.isStarted) {
-            var response = self.api!.startLiveView()
+            let response = self.api!.startLiveView()
             
             dispatch_async(dispatch_get_main_queue(), { [unowned self] in
-                var array = self.parseResponse(response)
-                var liveViewUrl = array![0] as NSString
+                let array = self.parseResponse(response)
+                let liveViewUrl = array![0] as! NSString
                 NSLog("liveViewUrl is %@", liveViewUrl)
                 
                 self.liveManager.start(liveViewUrl, closure:{(image:UIImage) -> () in
@@ -52,14 +52,14 @@ public class QXAPIManager: NSObject {
             if(devices != nil && devices!.count != 0) {
                 
                 //use first device
-                self.api = QXAPI(device:devices!.firstObject as QXDevice)
-                var result = self.getInformation()
+                self.api = QXAPI(device:devices!.firstObject as! QXDevice)
+                let result = self.getInformation()
                 
                 if(result) {
                     self.callEventAPI(true)
                     closure(result:true, error:nil)
                 } else {
-                    var error = self.createError("couldn't open connection")
+                    let error = self.createError("couldn't open connection")
                     closure(result:false, error:error)
                 }
                 
@@ -72,23 +72,27 @@ public class QXAPIManager: NSObject {
     // find available device by parsing XML file from QX Camera
     public func discoveryDevices(closure:(devices:NSArray?, error:NSError?) -> ()) {
         
-        var request:UdpRequest = UdpRequest()
+        let request:UdpRequest = UdpRequest()
         request.execute({[unowned self] (ddUrl:String!, uuId:[AnyObject]!) -> () in
 
             if(ddUrl != nil) {
-                var parser = QXXMLParser()
-            
-                parser.execute(ddUrl, closure:{[unowned self] (devices:NSArray) -> () in
-                    
-                    if(devices.count != 0) {
-                        closure(devices:devices, error:nil)
-                    } else {
-                        var error = self.createError("device not found")
-                        closure(devices:nil, error:error)
-                    }
-                })
+                do {
+                    let parser = QXXMLParser()
+                    try parser.execute(ddUrl, closure:{[unowned self] (devices:NSArray) -> () in
+                        if(devices.count != 0) {
+                            closure(devices:devices, error:nil)
+                        } else {
+                            let error = self.createError("device not found")
+                            closure(devices:nil, error:error)
+                        }
+                    })
+                } catch {
+                    let error = self.createError("XML parse error")
+                    closure(devices:nil, error:error)
+                }
+
             } else {
-                var error = self.createError("ddUrl not found")
+                let error = self.createError("ddUrl not found")
                 closure(devices:nil, error:error)
             }
         })
@@ -124,8 +128,8 @@ public class QXAPIManager: NSObject {
             return false
         }
         
-        var serverName = result![0] as NSString
-        var serverVersion = result![1] as NSString
+        //let serverName = result![0] as! NSString
+        let serverVersion = result![1] as! NSString
         //NSLog("parseGetApplicationInfo serverName = %@", serverName);
         //NSLog("parseGetApplicationInfo serverVersion = %@", serverVersion);
         self.isSupportedVersion = self.isSupportedServerVersion(serverVersion);
@@ -135,10 +139,10 @@ public class QXAPIManager: NSObject {
     
     public func callEventAPI(longPolling:Bool) {
         self.api?.getEvent(longPolling, closure:{ [unowned self] (json:NSDictionary, isSucceeded:Bool) -> () in
-            var array = json.objectForKey("result") as? NSArray
-            var dic = array?.objectAtIndex(1) as? NSDictionary
+            let array = json.objectForKey("result") as? NSArray
+            let dic = array?.objectAtIndex(1) as? NSDictionary
             if(dic != nil) {
-                var status = dic!.objectForKey("cameraStatus") as NSString
+                let status = dic!.objectForKey("cameraStatus") as! NSString
                 self.isCameraIdle = status.isEqualToString("IDLE")
             }
         })
@@ -153,9 +157,9 @@ public class QXAPIManager: NSObject {
         } else {
             
             self.api?.getEvent(false, closure:{ [unowned self] (json:NSDictionary, isSucceeded:Bool) in
-                var array = json.objectForKey("result") as? NSArray
-                var dic = array?.objectAtIndex(1) as? NSDictionary
-                var status = dic?.objectForKey("cameraStatus") as? NSString
+                let array = json.objectForKey("result") as? NSArray
+                let dic = array?.objectAtIndex(1) as? NSDictionary
+                let status = dic?.objectForKey("cameraStatus") as? NSString
                 
                 if(status != nil){
                     self.isCameraIdle = status!.isEqualToString("IDLE")
@@ -172,36 +176,31 @@ public class QXAPIManager: NSObject {
     
     // get UIImage from takePicture's response
     public func didTakePicture(json:NSDictionary) -> UIImage? {
-        var array = json.objectForKey("result") as? NSArray
-        var endpoint = (array?.objectAtIndex(0) as? NSArray)?.objectAtIndex(0) as? NSString
+        let array = json.objectForKey("result") as? NSArray
+        let endpoint = (array?.objectAtIndex(0) as? NSArray)?.objectAtIndex(0) as? NSString
         if(endpoint == nil) {
             return nil
         }
         
-        var url = NSURL(string:endpoint!)
-        var data = NSData(contentsOfURL:url!)
+        let url = NSURL(string:endpoint! as String)
+        let data = NSData(contentsOfURL:url!)
         return (data != nil) ? UIImage(data:data!) : nil
     }
     
     public func parseResponse(response:NSData) -> NSArray? {
-        
-        var e:NSError?
-        var dict:NSDictionary = NSJSONSerialization.JSONObjectWithData(response, options:NSJSONReadingOptions.MutableContainers, error:&e) as NSDictionary
-        
-        var resultArray:NSArray?;
-        
-        if(e != nil) {
-            NSLog("parseResponse error parsing JSON string")
-            
-        } else {
-            resultArray = dict["result"] as NSArray?
-            var errorArray = dict["error"] as NSArray?
+
+        do {
+            let dict = try NSJSONSerialization.JSONObjectWithData(response, options: .MutableContainers) as! NSDictionary
+            let resultArray = dict["result"] as! NSArray?
+            let errorArray = dict["error"] as! NSArray?
             if(errorArray != nil) {
                 NSLog("parseResponse has error")
             }
+            return resultArray
+        } catch {
+            NSLog("parseResponse error parsing JSON string")
+            return nil
         }
-
-        return resultArray
     }
     
     public func isApiAvailable(api:QXAPIList) -> Bool {
@@ -213,9 +212,9 @@ public class QXAPIManager: NSObject {
     }
     
     public func isSupportedServerVersion(version:NSString) -> Bool {
-        var versionModeList = version.componentsSeparatedByString(".") as NSArray
+        let versionModeList = version.componentsSeparatedByString(".") as NSArray
         if(versionModeList.count > 0) {
-            var major:CLong = versionModeList[0].integerValue
+            let major:CLong = versionModeList[0].integerValue
             if(2 <= major) {
                 NSLog("this version is supported")
                 return true
@@ -228,7 +227,7 @@ public class QXAPIManager: NSObject {
     }
     
     public func createError(message:NSString) -> NSError {
-        var error = NSError(domain:"com.qxcamera", code:35, userInfo:[NSLocalizedDescriptionKey:message])
+        let error = NSError(domain:"com.qxcamera", code:35, userInfo:[NSLocalizedDescriptionKey:message])
         return error
     }
     

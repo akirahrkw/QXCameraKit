@@ -20,9 +20,9 @@ public class QXLiveManager: NSObject {
         if(!self.isStarted) {
             self.isStarted = true
             self.closure = closure
-            var url = NSURL(string:liveviewUrl)
+            let url = NSURL(string:liveviewUrl as String)
             
-            var request = NSMutableURLRequest(URL:url!, cachePolicy:NSURLRequestCachePolicy.UseProtocolCachePolicy, timeoutInterval: 60.0)
+            let request = NSMutableURLRequest(URL:url!, cachePolicy:NSURLRequestCachePolicy.UseProtocolCachePolicy, timeoutInterval: 60.0)
             request.HTTPMethod = "GET"
             
             self.connection = NSURLConnection(request:request, delegate:self, startImmediately:true)
@@ -60,7 +60,7 @@ public class QXLiveManager: NSObject {
     }
     
     func getJpegPacket() {
-        var bytes = UnsafeMutablePointer<UInt8>.alloc(8)
+        _ = UnsafeMutablePointer<UInt8>.alloc(8)
         
         // remove 8 bytes common header
         self.removeBytes(8)
@@ -77,12 +77,12 @@ public class QXLiveManager: NSObject {
         self.checkPayloadHeader(nil)
         
         // get jpeg data size
-        var jData = UnsafeMutablePointer<UInt8>.alloc(3)
+        let jData = UnsafeMutablePointer<UInt8>.alloc(3)
         self.readBytes(3, buffer:jData)
         jpegDataSize = self.bytesToInt(jData, count:3)
         
         // get jpeg padding size
-        var jPadding = UnsafeMutablePointer<UInt8>.alloc(1)
+        let jPadding = UnsafeMutablePointer<UInt8>.alloc(1)
         self.readBytes(1, buffer:jPadding)
         jpegPaddingSize = self.bytesToInt(jPadding, count:1)
         
@@ -90,11 +90,11 @@ public class QXLiveManager: NSObject {
         self.removeBytes(120)
         
         // read jpeg image
-        var jpegData = UnsafeMutablePointer<UInt8>.alloc(jpegDataSize)
+        let jpegData = UnsafeMutablePointer<UInt8>.alloc(jpegDataSize)
         self.readBytes(jpegDataSize, buffer:jpegData)
     
-        var imageData = NSData(bytes:jpegData, length:jpegDataSize)
-        var image = UIImage(data:imageData)
+        let imageData = NSData(bytes:jpegData, length:jpegDataSize)
+        let image = UIImage(data:imageData)
         
         if(self.isJPEGValid(imageData)) {
             self.closure?(image: image!)
@@ -131,13 +131,13 @@ public class QXLiveManager: NSObject {
             sleep(UInt32(0.01))
         }
         
-        var startCodes = UnsafeMutablePointer<UInt8>.alloc(4)
+        let startCodes = UnsafeMutablePointer<UInt8>.alloc(4)
         startCodes[0] = 0x24
         startCodes[1] = 0x35
         startCodes[2] = 0x68
         startCodes[3] = 0x79
         
-        var startData = NSData(bytes:startCodes, length:4)
+        let startData = NSData(bytes:startCodes, length:4)
         var isFound = false
         var found:NSRange = NSMakeRange(0,4)
         
@@ -159,13 +159,13 @@ public class QXLiveManager: NSObject {
             synchronized(self) {
                 maxRangeLength = self.receiveData.length
             }
-            var currentRange:NSRange = NSMakeRange(0, maxRangeLength)
+            let currentRange:NSRange = NSMakeRange(0, maxRangeLength)
             
             synchronized(self) {
                 found = self.receiveData.rangeOfData(startData, options:NSDataSearchOptions.Backwards, range:currentRange)
             }
             if(found.location != NSNotFound) {
-                var lastFound:NSRange = found
+                let lastFound:NSRange = found
                 isFound = true
                 synchronized(self) {
                     self.receiveData.replaceBytesInRange(NSMakeRange(0,lastFound.location + 4), withBytes:nil, length:0)

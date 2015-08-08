@@ -21,12 +21,12 @@ class HttpAsynchronousRequest:NSObject {
     }
     
     func execute(){
-        var url = NSURL(string:self.url)
-        var request = NSMutableURLRequest(URL:url!, cachePolicy:NSURLRequestCachePolicy.UseProtocolCachePolicy, timeoutInterval:10.0)
+        let url = NSURL(string:self.url as String)
+        let request = NSMutableURLRequest(URL:url!, cachePolicy:NSURLRequestCachePolicy.UseProtocolCachePolicy, timeoutInterval:10.0)
         request.HTTPMethod = "POST"
         request.HTTPBody = self.params.dataUsingEncoding(NSUTF8StringEncoding)
         
-        var connection = NSURLConnection(request:request, delegate:self, startImmediately:false)
+        let connection = NSURLConnection(request:request, delegate:self, startImmediately:false)
         connection!.start()
     }
     
@@ -40,18 +40,23 @@ class HttpAsynchronousRequest:NSObject {
 
     func connection(connection: NSURLConnection, didFailWithError error: NSError) {
         NSLog("HttpRequest didFailWithError = %@", error)
-        var errorResponse = "{ \"id\"= 0 , \"error\"=[16,\"Transport Error\"]}"
-        var data = errorResponse.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: true)
+        let errorResponse = "{ \"id\"= 0 , \"error\"=[16,\"Transport Error\"]}"
+        let data = errorResponse.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: true)
 
-        var e:NSError?
-        var dict = NSJSONSerialization.JSONObjectWithData(data!, options:NSJSONReadingOptions.MutableContainers, error:&e) as NSDictionary
-        self.closure(json:dict, isSucceeded:false)
+        do {
+            let dict = try NSJSONSerialization.JSONObjectWithData(data!, options: .MutableContainers) as! NSDictionary
+            self.closure(json:dict, isSucceeded:false)
+        } catch {
+            self.closure(json:[String: AnyObject](), isSucceeded:false)
+        }
     }
     
     func connectionDidFinishLoading(connection: NSURLConnection) {
-        var e:NSError?
-        var dict = NSJSONSerialization.JSONObjectWithData(self.receiveData, options:NSJSONReadingOptions.MutableContainers, error: &e) as NSDictionary
-        self.closure(json:dict, isSucceeded:true)
+        do {
+            let dict = try NSJSONSerialization.JSONObjectWithData(self.receiveData, options:NSJSONReadingOptions.MutableContainers) as! NSDictionary
+            self.closure(json:dict, isSucceeded:true)
+        } catch {
+            self.closure(json:[String: AnyObject](), isSucceeded:true)
+        }
     }
-
 }

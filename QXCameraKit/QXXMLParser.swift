@@ -25,12 +25,12 @@ class QXXMLParser: NSObject, NSXMLParserDelegate {
         self.isParsingService = false
     }
     
-    func execute(url:NSString, closure:((devices:NSArray) -> ())) {
+    func execute(url:NSString, closure:((devices:NSArray) -> ())) throws {
         self.closure = closure
         
-        var request = NSMutableURLRequest(URL:NSURL(string:url)!)
-        var xmlData = NSURLConnection.sendSynchronousRequest(request, returningResponse:nil, error:nil)
-        var parser = NSXMLParser(data:xmlData)
+        let request = NSMutableURLRequest(URL:NSURL(string:url as String)!)
+        let xmlData = try NSURLConnection.sendSynchronousRequest(request, returningResponse:nil)
+        let parser = NSXMLParser(data:xmlData)
         parser.delegate = self
         parser.shouldProcessNamespaces = false
         parser.shouldReportNamespacePrefixes = false
@@ -39,16 +39,16 @@ class QXXMLParser: NSObject, NSXMLParserDelegate {
         self.parser!.parse()
     }
     
-    func parserDidStartDocument(parser:NSXMLParser!) {
+    func parserDidStartDocument(parser:NSXMLParser) {
         NSLog("XML File found and parsing started");
     }
     
-    func parser(parser:NSXMLParser!, parseErrorOccurred parseError:NSError!) {
-        var errorString = NSString(format: "Error Code %li", parseError.code)
+    func parser(parser:NSXMLParser, parseErrorOccurred parseError:NSError) {
+        let errorString = NSString(format: "Error Code %li", parseError.code)
         NSLog("Error: parsing XML: %@", errorString);
     }
     
-    func parser(parser:NSXMLParser!, didStartElement elementName:String!, namespaceURI:String!, qualifiedName qName:String!, attributes attributeDict: [NSObject : AnyObject]!) {
+    func parser(parser:NSXMLParser, didStartElement elementName:String, namespaceURI:String?, qualifiedName qName:String?, attributes attributeDict: [String : String]) {
         
         if(elementName == "device") {
             self.device = QXDevice()
@@ -71,7 +71,7 @@ class QXXMLParser: NSObject, NSXMLParserDelegate {
         }
     }
     
-    func parser(parser:NSXMLParser!, foundCharacters string:String!) {
+    func parser(parser:NSXMLParser, foundCharacters string:String) {
         if(self.parseStatus == 0) {
             self.device?.friendlyName = string
         }
@@ -90,7 +90,7 @@ class QXXMLParser: NSObject, NSXMLParserDelegate {
         }
     }
     
-    func parser(parser:NSXMLParser!, didEndElement elementName:String!, namespaceURI:String!, qualifiedName qName:String!) {
+    func parser(parser:NSXMLParser, didEndElement elementName:String, namespaceURI:String?, qualifiedName qName:String?) {
         
         if(elementName == "device") {
             if(self.isCameraDevice) {
@@ -115,7 +115,7 @@ class QXXMLParser: NSObject, NSXMLParserDelegate {
         }
     }
     
-    func parserDidEndDocument(parser:NSXMLParser!) {
+    func parserDidEndDocument(parser:NSXMLParser) {
         self.closure!(devices:self.devices)
     }
 
