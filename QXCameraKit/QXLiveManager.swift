@@ -109,7 +109,7 @@ public class QXLiveManager: NSObject {
         if(data.length < 2) {
             return false
         }
-        var bytes = UnsafePointer<UInt8>(data.bytes)
+        let bytes = UnsafePointer<UInt8>(data.bytes)
         return bytes[0] == 0xff && bytes[1] == 0xd8
     }
     
